@@ -1,0 +1,5 @@
+0.8.1
+  * BUGFIX: Pouches can no longer be shift-clicked into pouches when allowPouchInPouch is false
+
+0.8.0
+  Initial Build

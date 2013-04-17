@@ -1,3 +1,7 @@
+0.8.2
+  * Added a pouch that accesses the player's end chest
+  * Made the item id in the config reflect the in-game item id
+
 0.8.1
   * BUGFIX: Pouches can no longer be shift-clicked into pouches when allowPouchInPouch is false
 

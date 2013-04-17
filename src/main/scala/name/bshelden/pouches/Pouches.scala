@@ -22,7 +22,7 @@ import name.bshelden.pouches.items.Pouch
  * (c) 2013 Byron Shelden
  * See COPYING for details
  */
-@Mod(modid="Pouches", name="Pouches", version="0.8.1", dependencies = "required-after:Forge@[7.7.1,)", modLanguage="scala")
+@Mod(modid="Pouches", name="Pouches", version="0.8.2", dependencies = "required-after:Forge@[7.7.1,)", modLanguage="scala")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)
 object Pouches {
   private var _config: PouchesConfig = null
@@ -31,8 +31,11 @@ object Pouches {
   val NBT_POUCHID = "Pouches_PouchID"
   val NBT_INVENTORY = "Pouches_Inventory"
 
-  val ID_POUCH_DEFAULT = 4800
-  val ALLOW_POUCH_IN_POUCH_DEFAULT = false
+  val CFG_ID_POUCH_DEFAULT = 4800
+  val CFG_ALLOW_POUCH_IN_POUCH_DEFAULT = false
+  val CFG_ALLOW_END_POUCH_DEFAULT = true
+
+  val L_DISABLED_END_POUCH_MESSAGE = "L_DISABLED_END_POUCH_MESSAGE"
 
   def pouch: Pouch = _pouch
   def config: PouchesConfig = _config
@@ -55,7 +58,7 @@ object Pouches {
     NetworkRegistry.instance().registerGuiHandler(this, proxy)
 
     FMLLog.log(Level.FINE, "Pouches: Registering localizations")
-    LanguageRegistry.addName(pouch, "Pouch")
+    initTranslations()
 
     FMLLog.log(Level.FINE, "Pouches: Registering recipies")
     registerRecipies()
@@ -86,32 +89,70 @@ object Pouches {
 
     // Plum
     GameRegistry.addRecipe(
-      new ItemStack(pouch, 1, 16),
+      new ItemStack(pouch, 1, Pouch.DAMAGE_PLUM),
       " N ", "LCL", " L ",
       new Character('L'), new ItemStack(Item.leather),
       new Character('N'), new ItemStack(Item.goldNugget),
       new Character('C'), new ItemStack(Item.netherStalkSeeds))
+
+    // End chest pouch
+    if (config.allowEndPouch) {
+      GameRegistry.addRecipe(
+        new ItemStack(pouch, 1, Pouch.DAMAGE_END),
+        " N ", "LCL", " L ",
+        new Character('L'), new ItemStack(Item.leather),
+        new Character('N'), new ItemStack(Item.goldNugget),
+        new Character('C'), new ItemStack(Item.eyeOfEnder))
+    }
+  }
+
+  private def initTranslations() {
+    val lr = LanguageRegistry.instance()
+
+    LanguageRegistry.addName(pouch, "Pouch")
+    LanguageRegistry.addName(new ItemStack(pouch, 1, Pouch.DAMAGE_END), "End Pouch")
+
+    lr.addStringLocalization(L_DISABLED_END_POUCH_MESSAGE, "The %s has been disabled on this server.")
   }
 
   private def loadConfig(ev: FMLPreInitializationEvent): PouchesConfig = {
     FMLLog.log(Level.FINE, "Pouches: Loading configuration")
 
+    val ITEM_ID_OFFSET = 256  // Because Minecraft, that's why
+
     val cfg = new Configuration(ev.getSuggestedConfigurationFile)
 
     try {
       cfg.load()
-      val pouchId = cfg.getItem("pouch", ID_POUCH_DEFAULT).getInt(ID_POUCH_DEFAULT)
-      val allowPouchInPouch = cfg.get("options", "allowPouchInPouch", ALLOW_POUCH_IN_POUCH_DEFAULT).getBoolean(ALLOW_POUCH_IN_POUCH_DEFAULT)
 
-      PouchesConfig(pouchId, allowPouchInPouch)
+      val pouchId = cfg.getItem(
+        "pouch",
+        CFG_ID_POUCH_DEFAULT
+      ).getInt(CFG_ID_POUCH_DEFAULT) - ITEM_ID_OFFSET
+
+      val allowPouchInPouch = cfg.get(
+        "options",
+        "allowPouchInPouch",
+        CFG_ALLOW_POUCH_IN_POUCH_DEFAULT,
+        "Allow placing pouches into pouches.  Be warned that this enables infinite inventory capacity by chaining pouches!"
+      ).getBoolean(CFG_ALLOW_POUCH_IN_POUCH_DEFAULT)
+
+      val allowEndPouch = cfg.get(
+        "options",
+        "allowEndPouch",
+        CFG_ALLOW_END_POUCH_DEFAULT,
+        "Allow the crafting and use of End Pouches.  Note that setting this to false will disable existing end pouches, but will not delete them."
+      ).getBoolean(CFG_ALLOW_END_POUCH_DEFAULT)
+
+      PouchesConfig(pouchId, allowPouchInPouch, allowEndPouch)
     } catch {
       case e: Exception =>
-        FMLLog.log(Level.SEVERE, e, "Exception caught when trying to load the configuration for Pouches!")
-        PouchesConfig(ID_POUCH_DEFAULT, ALLOW_POUCH_IN_POUCH_DEFAULT)
+        FMLLog.log(Level.SEVERE, e, "Exception caught when trying to load the configuration for Pouches!  Loading defaults.")
+        PouchesConfig(CFG_ID_POUCH_DEFAULT, CFG_ALLOW_POUCH_IN_POUCH_DEFAULT, CFG_ALLOW_END_POUCH_DEFAULT)
     } finally {
       cfg.save()
     }
   }
 }
 
-case class PouchesConfig(pouchItemId: Int, allowPouchInPouch: Boolean)
+case class PouchesConfig(pouchItemId: Int, allowPouchInPouch: Boolean, allowEndPouch: Boolean)

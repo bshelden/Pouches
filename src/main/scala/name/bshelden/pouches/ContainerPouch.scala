@@ -17,8 +17,13 @@ class ContainerPouch(world: World, player: EntityPlayer, pouchInventory: Invento
 
   layout()
 
+  /** Returns the slot index containing the open pouch */
+  def lockedSlotIndex(): Int = {
+    player.inventory.currentItem
+  }
+
   override def canInteractWith(player: EntityPlayer): Boolean = {
-    true
+    this.player == player
   }
 
   override def transferStackInSlot(player: EntityPlayer, slotIndex: Int): ItemStack = {
@@ -125,7 +130,7 @@ class ContainerPouch(world: World, player: EntityPlayer, pouchInventory: Invento
       col <- 0 to 8
 //      if (col != player.inventory.currentItem)
     } {
-      // Be sure to skip the slot that would contain the pouch!
+      // Be sure to lock the slot that would contain the pouch!
       val slot: Slot = new PouchHotbarSlot(
         player.inventory,
         col,
@@ -156,12 +161,12 @@ object ContainerPouch {
   val GUI_SLOT_WIDTH = 18
   val GUI_SLOT_HEIGHT = 18
 
-  class PouchSlot(inv: IInventory, xPos: Int, yPos: Int, slotIndex: Int) extends Slot(inv, xPos, yPos, slotIndex) {
+  class PouchSlot(inv: IInventory, slotIndex: Int, xPos: Int, yPos: Int) extends Slot(inv, slotIndex, xPos, yPos) {
     override def isItemValid(itemStack: ItemStack): Boolean = {
       Pouches.config.allowPouchInPouch || (itemStack.getItem() != Pouches.pouch)
     }
   }
-  class PouchHotbarSlot(inv: IInventory, xPos: Int, yPos: Int, slotIndex: Int, locked: Boolean) extends Slot(inv, xPos, yPos, slotIndex) {
+  class PouchHotbarSlot(inv: IInventory, slotIndex: Int, xPos: Int, yPos: Int, val locked: Boolean) extends Slot(inv, slotIndex, xPos, yPos) {
     override def canTakeStack(p: EntityPlayer): Boolean = !locked
   }
 }

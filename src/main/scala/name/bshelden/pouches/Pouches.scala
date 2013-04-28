@@ -22,7 +22,7 @@ import name.bshelden.pouches.items.Pouch
  * (c) 2013 Byron Shelden
  * See COPYING for details
  */
-@Mod(modid="Pouches", name="Pouches", version="0.8.2", dependencies = "required-after:Forge@[7.7.1,)", modLanguage="scala")
+@Mod(modid="Pouches", modLanguage="scala")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)
 object Pouches {
   private var _config: PouchesConfig = null

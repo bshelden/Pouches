@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL11
 
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.inventory.Slot
 import net.minecraft.util.{Icon, StatCollector}
 
 import name.bshelden.pouches.{InventoryPouch, ContainerPouch}
@@ -28,6 +29,9 @@ class GuiContainerPouch(player: EntityPlayer,
   allowUserInput = false
   ySize = YSIZE_MAGIC + ROWS * 18
 
+  // Disable the number keys to avoid a nasty dupe
+  protected override def checkHotbarKeys(slot: Int): Boolean = false
+
   protected override def drawGuiContainerForegroundLayer(par1: Int, par2: Int) {
     val uName = if (pouchInventory.isInvNameLocalized()) {
       pouchInventory.getInvName()
@@ -43,20 +47,23 @@ class GuiContainerPouch(player: EntityPlayer,
 
     fontRenderer.drawString(uName, 8, 6, FONT_COLOR)
     fontRenderer.drawString(lName, 8, 74, FONT_COLOR)
+  }
 
-    val x = ContainerPouch.GUI_PLAYER_HOTBAR_OFFSET_X + (player.inventory.currentItem * ContainerPouch.GUI_SLOT_WIDTH)
-    val y = ContainerPouch.GUI_PLAYER_HOTBAR_OFFSET_Y
+  protected override def drawSlotInventory(slot: Slot) {
+    if (slot.isSlotInInventory(player.inventory, pouchContainer.lockedSlotIndex)) {
+      val x = slot.xDisplayPosition
+      val y = slot.yDisplayPosition
 
-/*
-    GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.5F)
-    GL11.glEnable(GL11.GL_BLEND)
-//    GL11.glEnable(GL11.GL_ALPHA)  This causes a fit when rendering
-    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-    GL11.glDisable(GL11.GL_LIGHTING)
-    this.mc.renderEngine.bindTexture("/gui/items.png")
-    this.drawTexturedModelRectFromIcon(x, y, pouchIcon, 16, 16)
-    GL11.glEnable(GL11.GL_LIGHTING)
-*/
+      GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.5F)
+      GL11.glEnable(GL11.GL_BLEND)
+      GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+      GL11.glDisable(GL11.GL_LIGHTING)
+      this.mc.renderEngine.bindTexture("/gui/items.png")
+      this.drawTexturedModelRectFromIcon(x, y, pouchIcon, 16, 16)
+      GL11.glEnable(GL11.GL_LIGHTING)
+    } else {
+      super.drawSlotInventory(slot)
+    }
   }
 
   protected def drawGuiContainerBackgroundLayer(f: Float, i: Int, j: Int) {

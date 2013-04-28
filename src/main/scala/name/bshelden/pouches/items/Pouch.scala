@@ -32,7 +32,8 @@ class Pouch(id: Int) extends Item(id) {
 
   def getPouchId(itemStack: ItemStack): Option[String] = {
     for {
-      ct <- Option(itemStack.getTagCompound)
+      is <- Option(itemStack)
+      ct <- Option(is.getTagCompound)
       if (itemStack.getItem == this)
       if (ct.hasKey(Pouches.NBT_POUCHID))
     } yield (ct.getString(Pouches.NBT_POUCHID))

@@ -1,0 +1,20 @@
+[
+  {
+    "modid": "Pouches",
+    "name": "Pouches",
+    "description": "Provides item containers you can carry around with you.",
+    "url": "http://github.com/bshelden/Pouches",
+    "updateUrl": "",
+    "logoFile": "",
+    "version": "0.8.3",
+    "credits": "By Byron Shelden, with artwork by Sheryl King",
+    "parent": "",
+    "authors": [ "Byron Shelden", "Sheryl King" ],
+    "mcversion": "1.5.1",
+    "screenshots": "",
+    "requiredMods": [
+      "Forge@[7.7.1,)"
+    ],
+    "useDependencyInformation": "true"
+  }
+]

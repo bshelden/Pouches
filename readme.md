@@ -6,7 +6,8 @@ A minecraft mod that provides 'pouches', items you can carry around with you wit
 Requirements
 ------------
 
-[Minecraft Forge](http://files.minecraftforge.net/) - At least version 7.7.1.647 as that is what I build against.
+ * [Minecraft Forge](http://files.minecraftforge.net/) - At least version 7.7.1.662 as that is what I build against.
+ * Scala 2.10 (Included with minecraft forge)
 
 Building
 --------
@@ -19,7 +20,7 @@ From `mcp/lib`
  * asm-all-4.1.jar
  * bcprov-debug-jdk15on-148.jar
  * guava-14.0-rc3.jar
- * scala-library.jar
+ * scala-library.jar (if not present, grab this from a working minecraft forge client)
 
 From `mcp/jars/bin`
 
@@ -31,9 +32,8 @@ From `mcp/jars/bin`
 Building for release
 --------------------
 
-As of this writing, mcp lacks support for Scala compiling and reobfuscation.
-Fortunately, OvermindDL1 has created a patch for MCP [here](http://overminddl1.com/minecraft/mcp_update_scala2.7z) that addresses this.
-Later versions of MCP will support this natively.
+As of Forge 1.5.1-7.7.2.678, forge/mcp can handle scala compilation.  If you are running from before this, you may need to patch your MCP:
+OvermindDL1 and LexManos have created a patch for MCP [here](http://overminddl1.com/minecraft/mcp_update_scala3.zip) that addresses this.
 
 1. Ensure that scala is on your path
 2. Install forge
